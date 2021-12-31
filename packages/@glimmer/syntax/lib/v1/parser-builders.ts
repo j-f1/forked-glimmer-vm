@@ -358,6 +358,61 @@ class Builders {
   number(value: number, loc: SourceSpan): ASTv1.NumberLiteral {
     return this.literal({ type: 'NumberLiteral', value, loc });
   }
+
+  partial({
+    name,
+    params,
+    hash,
+    strip,
+    indent,
+    loc,
+  }: {
+    name: ASTv1.PathExpression | ASTv1.SubExpression;
+    params: ASTv1.Expression[];
+    hash: ASTv1.Hash;
+    strip: ASTv1.StripFlags;
+    indent: string;
+    loc: SourceSpan;
+  }): ASTv1.PartialStatement {
+    return {
+      type: 'PartialStatement',
+      name,
+      params,
+      hash,
+      strip,
+      indent,
+      loc,
+    };
+  }
+
+  partialBlock({
+    name,
+    params,
+    hash,
+    content,
+    openStrip,
+    closeStrip,
+    loc,
+  }: {
+    name: ASTv1.PathExpression | ASTv1.SubExpression;
+    params: ASTv1.Expression[];
+    hash: ASTv1.Hash;
+    content: ASTv1.Block | ASTv1.Template;
+    openStrip: ASTv1.StripFlags;
+    closeStrip: ASTv1.StripFlags;
+    loc: SourceSpan;
+  }): ASTv1.PartialBlockStatement {
+    return {
+      type: 'PartialBlockStatement',
+      name,
+      params,
+      hash,
+      content,
+      openStrip,
+      closeStrip,
+      loc,
+    };
+  }
 }
 
 // Nodes

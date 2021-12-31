@@ -78,8 +78,7 @@ export type CallNode =
   | ElementModifierStatement
   | SubExpression;
 
-export interface MustacheStatement extends BaseNode {
-  type: 'MustacheStatement';
+interface CommonMustache extends BaseNode {
   path: Expression;
   params: Expression[];
   hash: Hash;
@@ -88,9 +87,14 @@ export interface MustacheStatement extends BaseNode {
   trusting: boolean;
   strip: StripFlags;
 }
+export interface MustacheStatement extends CommonMustache {
+  type: 'MustacheStatement';
+}
+export interface DecoratorStatement extends CommonMustache {
+  type: 'DecoratorStatement';
+}
 
-export interface BlockStatement extends BaseNode {
-  type: 'BlockStatement';
+interface CommonBlock extends BaseNode {
   path: Expression;
   params: Expression[];
   hash: Hash;
@@ -102,6 +106,14 @@ export interface BlockStatement extends BaseNode {
 
   // Printer extension
   chained?: boolean;
+}
+
+export interface BlockStatement extends CommonBlock {
+  type: 'BlockStatement';
+}
+
+export interface DecoratorBlock extends CommonBlock {
+  type: 'DecoratorBlock';
 }
 
 export interface ElementModifierStatement extends BaseNode {
@@ -118,6 +130,16 @@ export interface PartialStatement extends BaseNode {
   hash: Hash;
   indent: string;
   strip: StripFlags;
+}
+
+export interface PartialBlockStatement extends BaseNode {
+  type: 'PartialBlockStatement';
+  name: PathExpression | SubExpression;
+  params: Expression[];
+  hash: Hash;
+  content: Block | Template;
+  openStrip: StripFlags;
+  closeStrip: StripFlags;
 }
 
 export interface CommentStatement extends BaseNode {
@@ -310,6 +332,9 @@ export type SharedNodes = {
   MustacheStatement: MustacheStatement;
   ElementModifierStatement: ElementModifierStatement;
   PartialStatement: PartialStatement;
+  PartialBlockStatement: PartialBlockStatement;
+  DecoratorBlock: DecoratorBlock;
+  DecoratorStatement: DecoratorStatement;
   AttrNode: AttrNode;
   ConcatStatement: ConcatStatement;
 };

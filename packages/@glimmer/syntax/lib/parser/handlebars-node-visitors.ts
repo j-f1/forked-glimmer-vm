@@ -110,6 +110,7 @@ export abstract class HandlebarsNodeVisitors extends Parser {
     let parentProgram = this.currentElement();
 
     appendChild(parentProgram, node);
+    return node;
   }
 
   MustacheStatement(rawMustache: HBS.MustacheStatement): ASTv1.MustacheStatement | void {
@@ -250,32 +251,53 @@ export abstract class HandlebarsNodeVisitors extends Parser {
     return comment;
   }
 
-  PartialStatement(partial: HBS.PartialStatement): never {
-    throw generateSyntaxError(
-      `Handlebars partials are not supported`,
-      this.source.spanFor(partial.loc)
-    );
+  PartialStatement(partial: HBS.PartialStatement): ASTv1.PartialStatement {
+    const { path: name, params, hash } = acceptCallNodes(this, {
+      path: partial.name,
+      params: partial.params,
+      hash: partial.hash,
+    });
+    return b.partial({
+      name,
+      params,
+      hash,
+      strip: partial.strip,
+      indent: partial.indent,
+      loc: this.source.spanFor(partial.loc),
+    });
   }
 
-  PartialBlockStatement(partialBlock: HBS.PartialBlockStatement): never {
-    throw generateSyntaxError(
-      `Handlebars partial blocks are not supported`,
-      this.source.spanFor(partialBlock.loc)
-    );
+  PartialBlockStatement(partialBlock: HBS.PartialBlockStatement): ASTv1.PartialBlockStatement {
+    const { path: name, params, hash } = acceptCallNodes(this, {
+      path: partialBlock.name,
+      params: partialBlock.params,
+      hash: partialBlock.hash,
+    });
+    return b.partialBlock({
+      name,
+      params,
+      hash,
+      content: this.Program(partialBlock.program),
+      openStrip: partialBlock.openStrip,
+      closeStrip: partialBlock.closeStrip,
+      loc: this.source.spanFor(partialBlock.loc),
+    });
   }
 
-  Decorator(decorator: HBS.Decorator): never {
-    throw generateSyntaxError(
-      `Handlebars decorators are not supported`,
-      this.source.spanFor(decorator.loc)
-    );
+  Decorator(decorator: HBS.Decorator): ASTv1.DecoratorStatement | void {
+    const transformed: any = this.MustacheStatement({ ...decorator, type: 'MustacheStatement' });
+    if (transformed) {
+      transformed.type = 'DecoratorStatement';
+      return transformed;
+    }
   }
 
-  DecoratorBlock(decoratorBlock: HBS.DecoratorBlock): never {
-    throw generateSyntaxError(
-      `Handlebars decorator blocks are not supported`,
-      this.source.spanFor(decoratorBlock.loc)
-    );
+  DecoratorBlock(block: HBS.DecoratorBlock): ASTv1.DecoratorBlock | void {
+    const transformed: any = this.BlockStatement({ ...block, type: 'BlockStatement' });
+    if (transformed) {
+      transformed.type = 'DecoratorBlock';
+      return transformed;
+    }
   }
 
   SubExpression(sexpr: HBS.SubExpression): ASTv1.SubExpression {
