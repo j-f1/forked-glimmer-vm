@@ -389,7 +389,7 @@ class Builders {
     name,
     params,
     hash,
-    content,
+    program,
     openStrip,
     closeStrip,
     loc,
@@ -397,7 +397,7 @@ class Builders {
     name: ASTv1.PathExpression | ASTv1.SubExpression | ASTv1.NumberLiteral;
     params: ASTv1.Expression[];
     hash: ASTv1.Hash;
-    content: ASTv1.Block | ASTv1.Template;
+    program: ASTv1.Block | ASTv1.Template;
     openStrip: ASTv1.StripFlags;
     closeStrip: ASTv1.StripFlags;
     loc: SourceSpan;
@@ -407,7 +407,7 @@ class Builders {
       name,
       params,
       hash,
-      content,
+      program,
       openStrip,
       closeStrip,
       loc,

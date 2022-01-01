@@ -280,7 +280,7 @@ export abstract class HandlebarsNodeVisitors extends Parser {
       name,
       params,
       hash,
-      content: this.Program(partialBlock.program),
+      program: this.Program(partialBlock.program),
       openStrip: partialBlock.openStrip,
       closeStrip: partialBlock.closeStrip,
       loc: this.source.spanFor(partialBlock.loc),

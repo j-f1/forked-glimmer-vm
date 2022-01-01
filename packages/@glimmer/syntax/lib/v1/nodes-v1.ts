@@ -137,7 +137,7 @@ export interface PartialBlockStatement extends BaseNode {
   name: PathExpression | SubExpression | NumberLiteral;
   params: Expression[];
   hash: Hash;
-  content: Block | Template;
+  program: Block | Template;
   openStrip: StripFlags;
   closeStrip: StripFlags;
 }
