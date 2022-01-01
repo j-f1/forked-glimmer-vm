@@ -101,7 +101,7 @@ class Builders {
     inverseStrip = DEFAULT_STRIP,
     closeStrip = DEFAULT_STRIP,
   }: {
-    path: ASTv1.PathExpression | ASTv1.SubExpression;
+    path: ASTv1.PathExpression | ASTv1.SubExpression | ASTv1.NumberLiteral;
     params: ASTv1.Expression[];
     hash: ASTv1.Hash;
     defaultBlock: ASTv1.Block;
@@ -226,7 +226,7 @@ class Builders {
     hash,
     loc,
   }: {
-    path: ASTv1.PathExpression | ASTv1.SubExpression;
+    path: ASTv1.PathExpression | ASTv1.SubExpression | ASTv1.NumberLiteral;
     params: ASTv1.Expression[];
     hash: ASTv1.Hash;
     loc: SourceSpan;
@@ -367,7 +367,7 @@ class Builders {
     indent,
     loc,
   }: {
-    name: ASTv1.PathExpression | ASTv1.SubExpression;
+    name: ASTv1.PathExpression | ASTv1.SubExpression | ASTv1.NumberLiteral;
     params: ASTv1.Expression[];
     hash: ASTv1.Hash;
     strip: ASTv1.StripFlags;
@@ -394,7 +394,7 @@ class Builders {
     closeStrip,
     loc,
   }: {
-    name: ASTv1.PathExpression | ASTv1.SubExpression;
+    name: ASTv1.PathExpression | ASTv1.SubExpression | ASTv1.NumberLiteral;
     params: ASTv1.Expression[];
     hash: ASTv1.Hash;
     content: ASTv1.Block | ASTv1.Template;

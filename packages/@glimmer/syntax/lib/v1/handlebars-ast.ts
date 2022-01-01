@@ -101,7 +101,7 @@ export interface DecoratorBlock extends CommonBlock {
 
 export interface PartialStatement extends CommonNode {
   type: 'PartialStatement';
-  name: PathExpression | SubExpression;
+  name: PathExpression | SubExpression | NumberLiteral;
   params: Expression[];
   hash: Hash;
   indent: string;
@@ -110,7 +110,7 @@ export interface PartialStatement extends CommonNode {
 
 export interface PartialBlockStatement extends CommonNode {
   type: 'PartialBlockStatement';
-  name: PathExpression | SubExpression;
+  name: PathExpression | SubExpression | NumberLiteral;
   params: Expression[];
   hash: Hash;
   program: Program;

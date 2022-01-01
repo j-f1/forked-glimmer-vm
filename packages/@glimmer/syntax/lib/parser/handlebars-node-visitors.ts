@@ -462,19 +462,17 @@ function updateTokenizerLocation(tokenizer: Parser['tokenizer'], content: HBS.Co
 function acceptCallNodes(
   compiler: HandlebarsNodeVisitors,
   node: {
-    path: HBS.PathExpression | HBS.SubExpression;
+    path: HBS.PathExpression | HBS.SubExpression | HBS.NumberLiteral;
     params: HBS.Expression[];
     hash: HBS.Hash;
   }
 ): {
-  path: ASTv1.PathExpression | ASTv1.SubExpression;
+  path: ASTv1.PathExpression | ASTv1.SubExpression | ASTv1.NumberLiteral;
   params: ASTv1.Expression[];
   hash: ASTv1.Hash;
 } {
-  let path =
-    node.path.type === 'PathExpression'
-      ? compiler.PathExpression(node.path)
-      : compiler.SubExpression(node.path);
+  let path = compiler[node.path.type](node.path as any);
+
   let params = node.params ? node.params.map((e) => compiler.acceptNode<ASTv1.Expression>(e)) : [];
 
   // if there is no hash, position it as a collapsed node immediately after the last param (or the

@@ -125,7 +125,7 @@ export interface ElementModifierStatement extends BaseNode {
 
 export interface PartialStatement extends BaseNode {
   type: 'PartialStatement';
-  name: PathExpression | SubExpression;
+  name: PathExpression | SubExpression | NumberLiteral;
   params: Expression[];
   hash: Hash;
   indent: string;
@@ -134,7 +134,7 @@ export interface PartialStatement extends BaseNode {
 
 export interface PartialBlockStatement extends BaseNode {
   type: 'PartialBlockStatement';
-  name: PathExpression | SubExpression;
+  name: PathExpression | SubExpression | NumberLiteral;
   params: Expression[];
   hash: Hash;
   content: Block | Template;
