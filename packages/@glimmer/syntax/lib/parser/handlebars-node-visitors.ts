@@ -315,30 +315,7 @@ export abstract class HandlebarsNodeVisitors extends Parser {
     let parts: string[];
 
     if (original.indexOf('/') !== -1) {
-      if (original.slice(0, 2) === './') {
-        throw generateSyntaxError(
-          `Using "./" is not supported in Glimmer and unnecessary`,
-          this.source.spanFor(path.loc)
-        );
-      }
-      if (original.slice(0, 3) === '../') {
-        throw generateSyntaxError(
-          `Changing context using "../" is not supported in Glimmer`,
-          this.source.spanFor(path.loc)
-        );
-      }
-      if (original.indexOf('.') !== -1) {
-        throw generateSyntaxError(
-          `Mixing '.' and '/' in paths is not supported in Glimmer; use only '.' to separate property paths`,
-          this.source.spanFor(path.loc)
-        );
-      }
       parts = [path.parts.join('/')];
-    } else if (original === '.') {
-      throw generateSyntaxError(
-        `'.' is not a supported path in Glimmer; check for a path with a trailing '.'`,
-        this.source.spanFor(path.loc)
-      );
     } else {
       parts = path.parts;
     }
@@ -389,19 +366,12 @@ export abstract class HandlebarsNodeVisitors extends Parser {
     } else {
       let head = parts.shift();
 
-      if (head === undefined) {
-        throw generateSyntaxError(
-          `Attempted to parse a path expression, but it was not valid. Paths must start with a-z or A-Z.`,
-          this.source.spanFor(path.loc)
-        );
-      }
-
       pathHead = {
         type: 'VarHead',
-        name: head,
+        name: head!,
         loc: {
           start: path.loc.start,
-          end: { line: path.loc.start.line, column: path.loc.start.column + head.length },
+          end: { line: path.loc.start.line, column: path.loc.start.column + (head?.length ?? 0) },
         },
       };
     }
