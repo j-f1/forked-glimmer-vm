@@ -180,6 +180,7 @@ export type StatementName =
   | 'CommentStatement'
   | 'BlockStatement'
   | 'PartialStatement'
+  | 'PartialBlockStatement'
   | 'MustacheCommentStatement'
   | 'TextNode'
   | 'ElementNode';

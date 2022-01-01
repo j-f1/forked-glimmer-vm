@@ -312,6 +312,7 @@ class StatementNormalizer {
   normalize(node: ASTv1.Statement): ASTv2.ContentNode | ASTv2.NamedBlock {
     switch (node.type) {
       case 'PartialStatement':
+      case 'PartialBlockStatement':
         throw new Error(`Handlebars partial syntax ({{> ...}}) is not allowed in Glimmer`);
       case 'BlockStatement':
         return this.BlockStatement(node);

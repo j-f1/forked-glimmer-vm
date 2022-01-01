@@ -257,7 +257,8 @@ export abstract class HandlebarsNodeVisitors extends Parser {
       params: partial.params,
       hash: partial.hash,
     });
-    return b.partial({
+
+    const node = b.partial({
       name,
       params,
       hash,
@@ -265,6 +266,8 @@ export abstract class HandlebarsNodeVisitors extends Parser {
       indent: partial.indent,
       loc: this.source.spanFor(partial.loc),
     });
+    appendChild(this.currentElement(), node);
+    return node;
   }
 
   PartialBlockStatement(partialBlock: HBS.PartialBlockStatement): ASTv1.PartialBlockStatement {
@@ -273,7 +276,7 @@ export abstract class HandlebarsNodeVisitors extends Parser {
       params: partialBlock.params,
       hash: partialBlock.hash,
     });
-    return b.partialBlock({
+    const node = b.partialBlock({
       name,
       params,
       hash,
@@ -282,6 +285,8 @@ export abstract class HandlebarsNodeVisitors extends Parser {
       closeStrip: partialBlock.closeStrip,
       loc: this.source.spanFor(partialBlock.loc),
     });
+    appendChild(this.currentElement(), node);
+    return node;
   }
 
   Decorator(decorator: HBS.Decorator): ASTv1.DecoratorStatement | void {
