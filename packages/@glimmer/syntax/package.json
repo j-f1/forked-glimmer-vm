@@ -1,7 +1,7 @@
 {
-  "name": "@glimmer/syntax",
-  "version": "0.83.1",
-  "repository": "https://github.com/glimmerjs/glimmer-vm/tree/master/packages/@glimmer/syntax",
+  "name": "@j-f/glimmer-syntax",
+  "version": "0.0.1",
+  "repository": "https://github.com/j-f1/forked-glimmer-vm/tree/prettier/packages/@glimmer/syntax",
   "dependencies": {
     "@glimmer/interfaces": "0.83.1",
     "@glimmer/util": "0.83.1",
