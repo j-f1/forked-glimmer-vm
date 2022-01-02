@@ -2,7 +2,24 @@ import { preprocess as parse, builders as b, ASTv1 } from '..';
 import { Dict } from '@glimmer/interfaces';
 
 import { astEqual } from './support';
-import { syntaxErrorFor } from '../../integration-tests';
+
+function syntaxErrorFor(
+  message: string,
+  code: string,
+  moduleName: string,
+  line: number,
+  column: number
+): Error {
+  let quotedCode = code ? `\n\n|\n|  ${code.split('\n').join('\n|  ')}\n|\n\n` : '';
+
+  let error = new Error(
+    `${message}: ${quotedCode}(error occurred in '${moduleName}' @ line ${line} : column ${column})`
+  );
+
+  error.name = 'SyntaxError';
+
+  return error;
+}
 
 const test = QUnit.test;
 

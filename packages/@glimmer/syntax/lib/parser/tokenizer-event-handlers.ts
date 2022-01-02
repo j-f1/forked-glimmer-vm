@@ -3,8 +3,6 @@ import { assertPresent, assign } from '@glimmer/util';
 import { parse, parseWithoutProcessing } from '@handlebars/parser';
 import { EntityParser } from 'simple-html-tokenizer';
 
-import print from '../generation/print';
-import { voidMap } from '../generation/printer';
 import { Tag } from '../parser';
 import { Source } from '../source/source';
 import { SourceOffset, SourceSpan } from '../source/span';
@@ -18,6 +16,16 @@ import * as HBS from '../v1/handlebars-ast';
 import b from '../v1/parser-builders';
 import publicBuilder from '../v1/public-builders';
 import { HandlebarsNodeVisitors } from './handlebars-node-visitors';
+
+export const voidMap: {
+  [tagName: string]: boolean;
+} = Object.create(null);
+
+let voidTagNames =
+  'area base br col command embed hr img input keygen link meta param source track wbr';
+voidTagNames.split(' ').forEach((tagName) => {
+  voidMap[tagName] = true;
+});
 
 export class TokenizerEventHandlers extends HandlebarsNodeVisitors {
   private tagOpenLine = 0;
@@ -370,7 +378,6 @@ export interface PreprocessOptions {
 export interface Syntax {
   parse: typeof preprocess;
   builders: typeof publicBuilder;
-  print: typeof print;
   traverse: typeof traverse;
   Walker: typeof Walker;
 }
@@ -378,7 +385,6 @@ export interface Syntax {
 const syntax: Syntax = {
   parse: preprocess,
   builders: publicBuilder,
-  print,
   traverse,
   Walker,
 };
