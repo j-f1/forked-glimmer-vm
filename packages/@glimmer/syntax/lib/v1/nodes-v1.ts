@@ -72,11 +72,7 @@ export interface Call extends BaseNode {
   hash: Hash;
 }
 
-export type CallNode =
-  | MustacheStatement
-  | BlockStatement
-  | ElementModifierStatement
-  | SubExpression;
+export type CallNode = MustacheStatement | BlockStatement | SubExpression;
 
 interface CommonMustache extends BaseNode {
   path: Expression;
@@ -114,13 +110,6 @@ export interface BlockStatement extends CommonBlock {
 
 export interface DecoratorBlock extends CommonBlock {
   type: 'DecoratorBlock';
-}
-
-export interface ElementModifierStatement extends BaseNode {
-  type: 'ElementModifierStatement';
-  path: Expression;
-  params: Expression[];
-  hash: Hash;
 }
 
 export interface PartialStatement extends BaseNode {
@@ -170,7 +159,7 @@ export interface ElementNode extends BaseNode {
   selfClosing: boolean;
   attributes: AttrNode[];
   blockParams: string[];
-  modifiers: ElementModifierStatement[];
+  modifiers: DynamicValue[];
   comments: MustacheCommentStatement[];
   children: Statement[];
 }
@@ -188,7 +177,7 @@ export type StatementName =
 export interface AttrNode extends BaseNode {
   type: 'AttrNode';
   name: string;
-  value: TextNode | MustacheStatement | ConcatStatement;
+  value: TextNode | DynamicValue | ConcatStatement;
 }
 
 export type AttrValue = TextNode | MustacheStatement | ConcatStatement;
@@ -200,7 +189,7 @@ export interface TextNode extends BaseNode {
 
 export interface ConcatStatement extends BaseNode {
   type: 'ConcatStatement';
-  parts: PresentArray<TextNode | MustacheStatement>;
+  parts: PresentArray<TextNode | DynamicValue>;
 }
 
 export type ExpressionName = 'SubExpression' | 'PathExpression' | LiteralName;
@@ -331,7 +320,6 @@ export type SharedNodes = {
   NullLiteral: NullLiteral;
   UndefinedLiteral: UndefinedLiteral;
   MustacheStatement: MustacheStatement;
-  ElementModifierStatement: ElementModifierStatement;
   PartialStatement: PartialStatement;
   PartialBlockStatement: PartialBlockStatement;
   DecoratorBlock: DecoratorBlock;
@@ -361,3 +349,4 @@ export type Literal = Nodes[LiteralName];
 export type Expression = Nodes[ExpressionName];
 export type Expressions = Pick<Nodes, ExpressionName>;
 export type TopLevelStatement = Statement | Nodes['Block'];
+export type DynamicValue = MustacheStatement | PartialStatement;

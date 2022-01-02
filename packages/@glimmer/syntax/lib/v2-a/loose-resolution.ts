@@ -19,10 +19,8 @@ export function SexpSyntaxContext(node: ASTv1.SubExpression): ASTv2.FreeVarResol
   }
 }
 
-export function ModifierSyntaxContext(
-  node: ASTv1.ElementModifierStatement
-): ASTv2.FreeVarResolution | null {
-  if (isSimpleCallee(node)) {
+export function ModifierSyntaxContext(node: ASTv1.DynamicValue): ASTv2.FreeVarResolution | null {
+  if (isSimpleCallee(node as any)) {
     return ASTv2.LooseModeResolution.namespaced(ASTv2.FreeVarNamespace.Modifier);
   } else {
     return null;

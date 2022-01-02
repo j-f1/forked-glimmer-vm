@@ -79,41 +79,6 @@ test('Elements and attributes', function () {
   ]);
 });
 
-test('Element modifiers', function () {
-  let ast = parse(`<div {{modifier}}{{modifier param1 param2 key1=value key2=value}}></div>`);
-  let el = ast.body[0] as AST.ElementNode;
-  traversalEqual(ast, [
-    ['enter', ast],
-    ['enter', el],
-    ['enter', el.modifiers[0]],
-    ['enter', el.modifiers[0].path],
-    ['exit', el.modifiers[0].path],
-    ['enter', el.modifiers[0].hash],
-    ['exit', el.modifiers[0].hash],
-    ['exit', el.modifiers[0]],
-    ['enter', el.modifiers[1]],
-    ['enter', el.modifiers[1].path],
-    ['exit', el.modifiers[1].path],
-    ['enter', el.modifiers[1].params[0]],
-    ['exit', el.modifiers[1].params[0]],
-    ['enter', el.modifiers[1].params[1]],
-    ['exit', el.modifiers[1].params[1]],
-    ['enter', el.modifiers[1].hash],
-    ['enter', el.modifiers[1].hash.pairs[0]],
-    ['enter', el.modifiers[1].hash.pairs[0].value],
-    ['exit', el.modifiers[1].hash.pairs[0].value],
-    ['exit', el.modifiers[1].hash.pairs[0]],
-    ['enter', el.modifiers[1].hash.pairs[1]],
-    ['enter', el.modifiers[1].hash.pairs[1].value],
-    ['exit', el.modifiers[1].hash.pairs[1].value],
-    ['exit', el.modifiers[1].hash.pairs[1]],
-    ['exit', el.modifiers[1].hash],
-    ['exit', el.modifiers[1]],
-    ['exit', el],
-    ['exit', ast],
-  ]);
-});
-
 test('Blocks', function () {
   let ast = parse(
     `{{#block}}{{/block}}` +
@@ -324,36 +289,6 @@ test('Helper', function (assert) {
         ]);
 
         assert.notEqual((path.parent!.node as AST.SubExpression).params.indexOf(node), -1);
-      }
-    },
-  });
-});
-
-test('Modifier', function (assert) {
-  let hasSymbol = typeof Symbol !== 'undefined';
-
-  assert.expect(hasSymbol ? 3 : 2);
-
-  let ast = parse(`<div {{foo}}></div>`);
-
-  traverse(ast, {
-    PathExpression(node, path) {
-      if (node.original === 'foo') {
-        assert.deepEqual(describeFullPath(path), [
-          { nodeType: 'Template', key: 'body' },
-          { nodeType: 'ElementNode', key: 'modifiers' },
-          { nodeType: 'ElementModifierStatement', key: 'path' },
-          { nodeType: 'PathExpression', key: null },
-        ]);
-
-        if (hasSymbol) {
-          assert.deepEqual(
-            Array.from(path.parents()).map((it) => (it as WalkerPath<AST.Node>).node.type),
-            ['ElementModifierStatement', 'ElementNode', 'Template']
-          );
-        }
-
-        assert.strictEqual((path.parent!.node as AST.ElementModifierStatement).path, node);
       }
     },
   });

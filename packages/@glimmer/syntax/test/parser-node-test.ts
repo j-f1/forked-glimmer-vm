@@ -704,7 +704,7 @@ export type SexpValue =
 
 export interface BuildElementOptions {
   attrs?: ASTv1.AttrNode[];
-  modifiers?: ASTv1.ElementModifierStatement[];
+  modifiers?: ASTv1.DynamicValue[];
   children?: ASTv1.Statement[];
   comments?: ElementComment[];
   blockParams?: string[];
@@ -803,9 +803,9 @@ export function normalizeAttr(sexp: AttrSexp): ASTv1.AttrNode {
   return b.attr(name, value);
 }
 
-export function normalizeModifier(sexp: ModifierSexp): ASTv1.ElementModifierStatement {
+export function normalizeModifier(sexp: ModifierSexp): any {
   if (typeof sexp === 'string') {
-    return b.elementModifier(sexp);
+    return null;
   }
 
   let path: ASTv1.Expression = normalizeHead(sexp[0]);

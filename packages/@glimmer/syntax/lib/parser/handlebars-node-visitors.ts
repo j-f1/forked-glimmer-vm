@@ -1,10 +1,10 @@
 import { Option, Recast } from '@glimmer/interfaces';
 import { TokenizerState } from 'simple-html-tokenizer';
 
-import { Parser, ParserNodeBuilder, Tag } from '../parser';
+import { Parser } from '../parser';
 import { NON_EXISTENT_LOCATION } from '../source/location';
 import { generateSyntaxError } from '../syntax-error';
-import { appendChild, isHBSLiteral, printLiteral } from '../utils';
+import { appendChild, isHBSLiteral } from '../utils';
 import * as ASTv1 from '../v1/api';
 import * as HBS from '../v1/handlebars-ast';
 import { PathExpressionImplV1 } from '../v1/legacy-interop';
@@ -150,49 +150,11 @@ export abstract class HandlebarsNodeVisitors extends Parser {
       });
     }
 
-    switch (tokenizer.state) {
-      // Tag helpers
-      case TokenizerState.tagOpen:
-      case TokenizerState.tagName:
-        throw generateSyntaxError(`Cannot use mustaches in an elements tagname`, mustache.loc);
-
-      case TokenizerState.beforeAttributeName:
-        addElementModifier(this.currentStartTag, mustache);
-        break;
-      case TokenizerState.attributeName:
-      case TokenizerState.afterAttributeName:
-        this.beginAttributeValue(false);
-        this.finishAttributeValue();
-        addElementModifier(this.currentStartTag, mustache);
-        tokenizer.transitionTo(TokenizerState.beforeAttributeName);
-        break;
-      case TokenizerState.afterAttributeValueQuoted:
-        addElementModifier(this.currentStartTag, mustache);
-        tokenizer.transitionTo(TokenizerState.beforeAttributeName);
-        break;
-
-      // Attribute values
-      case TokenizerState.beforeAttributeValue:
-        this.beginAttributeValue(false);
-        this.appendDynamicAttributeValuePart(mustache);
-        tokenizer.transitionTo(TokenizerState.attributeValueUnquoted);
-        break;
-      case TokenizerState.attributeValueDoubleQuoted:
-      case TokenizerState.attributeValueSingleQuoted:
-      case TokenizerState.attributeValueUnquoted:
-        this.appendDynamicAttributeValuePart(mustache);
-        break;
-
-      // TODO: Only append child when the tokenizer state makes
-      // sense to do so, otherwise throw an error.
-      default:
-        appendChild(this.currentElement(), mustache);
-    }
-
+    this._injectStatement(mustache);
     return mustache;
   }
 
-  appendDynamicAttributeValuePart(part: ASTv1.MustacheStatement): void {
+  appendDynamicAttributeValuePart(part: ASTv1.DynamicValue): void {
     this.finalizeTextPart();
     let attr = this.currentAttr;
     attr.isDynamic = true;
@@ -266,7 +228,7 @@ export abstract class HandlebarsNodeVisitors extends Parser {
       indent: partial.indent,
       loc: this.source.spanFor(partial.loc),
     });
-    appendChild(this.currentElement(), node);
+    this._injectStatement(node);
     return node;
   }
 
@@ -415,6 +377,47 @@ export abstract class HandlebarsNodeVisitors extends Parser {
   NullLiteral(nul: HBS.NullLiteral): ASTv1.NullLiteral {
     return b.literal({ type: 'NullLiteral', value: null, loc: nul.loc });
   }
+
+  private _injectStatement(node: ASTv1.DynamicValue) {
+    switch (this.tokenizer.state) {
+      // Tag helpers
+      case TokenizerState.tagOpen:
+      case TokenizerState.tagName:
+        throw generateSyntaxError(`Cannot use mustaches in an elements tagname`, node.loc);
+
+      case TokenizerState.beforeAttributeName:
+        this.currentStartTag.modifiers.push(node);
+        break;
+      case TokenizerState.attributeName:
+      case TokenizerState.afterAttributeName:
+        this.beginAttributeValue(false);
+        this.finishAttributeValue();
+        this.currentStartTag.modifiers.push(node);
+        this.tokenizer.transitionTo(TokenizerState.beforeAttributeName);
+        break;
+      case TokenizerState.afterAttributeValueQuoted:
+        this.currentStartTag.modifiers.push(node);
+        this.tokenizer.transitionTo(TokenizerState.beforeAttributeName);
+        break;
+
+      // Attribute values
+      case TokenizerState.beforeAttributeValue:
+        this.beginAttributeValue(false);
+        this.appendDynamicAttributeValuePart(node);
+        this.tokenizer.transitionTo(TokenizerState.attributeValueUnquoted);
+        break;
+      case TokenizerState.attributeValueDoubleQuoted:
+      case TokenizerState.attributeValueSingleQuoted:
+      case TokenizerState.attributeValueUnquoted:
+        this.appendDynamicAttributeValuePart(node);
+        break;
+
+      // TODO: Only append child when the tokenizer state makes
+      // sense to do so, otherwise throw an error.
+      default:
+        appendChild(this.currentElement(), node);
+    }
+  }
 }
 
 function calculateRightStrippedOffsets(original: string, value: string) {
@@ -488,21 +491,4 @@ function acceptCallNodes(
       } as const);
 
   return { path, params, hash };
-}
-
-function addElementModifier(
-  element: ParserNodeBuilder<Tag<'StartTag'>>,
-  mustache: ASTv1.MustacheStatement
-) {
-  let { path, params, hash, loc } = mustache;
-
-  if (isHBSLiteral(path)) {
-    let modifier = `{{${printLiteral(path)}}}`;
-    let tag = `<${element.name} ... ${modifier} ...`;
-
-    throw generateSyntaxError(`In ${tag}, ${modifier} is not a valid modifier`, mustache.loc);
-  }
-
-  let modifier = b.elementModifier({ path, params, hash, loc });
-  element.modifiers.push(modifier);
 }

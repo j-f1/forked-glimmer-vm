@@ -142,7 +142,7 @@ class Builders {
   }
 
   concat(
-    parts: PresentArray<ASTv1.TextNode | ASTv1.MustacheStatement>,
+    parts: PresentArray<ASTv1.TextNode | ASTv1.DynamicValue>,
     loc: SourceSpan
   ): ASTv1.ConcatStatement {
     return {
@@ -171,26 +171,6 @@ class Builders {
       modifiers: modifiers || [],
       comments: (comments as ASTv1.MustacheCommentStatement[]) || [],
       children: children || [],
-      loc,
-    };
-  }
-
-  elementModifier({
-    path,
-    params,
-    hash,
-    loc,
-  }: {
-    path: ASTv1.PathExpression | ASTv1.SubExpression;
-    params: ASTv1.Expression[];
-    hash: ASTv1.Hash;
-    loc: SourceSpan;
-  }): ASTv1.ElementModifierStatement {
-    return {
-      type: 'ElementModifierStatement',
-      path,
-      params,
-      hash,
       loc,
     };
   }
@@ -451,7 +431,7 @@ export interface BuildElementOptions {
   tag: string;
   selfClosing: boolean;
   attrs: ASTv1.AttrNode[];
-  modifiers: ASTv1.ElementModifierStatement[];
+  modifiers: ASTv1.DynamicValue[];
   children: ASTv1.Statement[];
   comments: ElementComment[];
   blockParams: string[];

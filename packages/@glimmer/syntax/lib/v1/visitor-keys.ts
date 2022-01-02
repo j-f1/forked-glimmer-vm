@@ -13,7 +13,6 @@ const visitorKeys = {
   DecoratorStatement: tuple('path', 'params', 'hash'),
   BlockStatement: tuple('path', 'params', 'hash', 'program', 'inverse'),
   DecoratorBlock: tuple('path', 'params', 'hash', 'program', 'inverse'),
-  ElementModifierStatement: tuple('path', 'params', 'hash'),
   PartialStatement: tuple('name', 'params', 'hash'),
   PartialBlockStatement: tuple('name', 'params', 'hash', 'content'),
   CommentStatement: tuple(),
