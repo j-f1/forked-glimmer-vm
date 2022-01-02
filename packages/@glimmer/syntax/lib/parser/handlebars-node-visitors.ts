@@ -15,6 +15,9 @@ export abstract class HandlebarsNodeVisitors extends Parser {
   abstract beginAttributeValue(quoted: boolean): void;
   abstract finishAttributeValue(): void;
 
+  // inside an if inside an opening HTML tag, for example
+  private isConstrained = 0;
+
   private get isTopLevel() {
     return this.elementStack.length === 0;
   }
@@ -71,17 +74,8 @@ export abstract class HandlebarsNodeVisitors extends Parser {
       return;
     }
 
-    if (
-      this.tokenizer.state !== TokenizerState.data &&
-      this.tokenizer.state !== TokenizerState.beforeData
-    ) {
-      throw generateSyntaxError(
-        'A block may only be used inside an HTML element or another block.',
-        this.source.spanFor(block.loc)
-      );
-    }
-
     let { path, params, hash } = acceptCallNodes(this, block);
+    const loc = this.source.spanFor(block.loc);
 
     // These are bugs in Handlebars upstream
     if (!block.program.loc) {
@@ -92,8 +86,32 @@ export abstract class HandlebarsNodeVisitors extends Parser {
       block.inverse.loc = NON_EXISTENT_LOCATION;
     }
 
-    let program = this.Program(block.program);
-    let inverse = block.inverse ? this.Program(block.inverse) : null;
+    let program: ASTv1.Block;
+    let inverse: ASTv1.Block | null;
+    switch (this.tokenizer.state) {
+      case TokenizerState.tagOpen:
+      case TokenizerState.tagName:
+        throw generateSyntaxError(`Cannot use mustaches in an elements tagname`, loc);
+
+      case TokenizerState.beforeAttributeName:
+      case TokenizerState.attributeName:
+      case TokenizerState.afterAttributeName:
+      case TokenizerState.afterAttributeValueQuoted:
+      // ^ the above are technically wrong since the if could contain attributes but :shrug:
+      case TokenizerState.beforeAttributeValue:
+      case TokenizerState.attributeValueDoubleQuoted:
+      case TokenizerState.attributeValueSingleQuoted:
+      case TokenizerState.attributeValueUnquoted:
+        this.isConstrained++;
+        program = this.Program(block.program);
+        inverse = block.inverse ? this.Program(block.inverse) : null;
+        this.isConstrained--;
+        break;
+
+      default:
+        program = this.Program(block.program);
+        inverse = block.inverse ? this.Program(block.inverse) : null;
+    }
 
     let node = b.block({
       path,
@@ -101,15 +119,13 @@ export abstract class HandlebarsNodeVisitors extends Parser {
       hash,
       defaultBlock: program,
       elseBlock: inverse,
-      loc: this.source.spanFor(block.loc),
+      loc,
       openStrip: block.openStrip,
       inverseStrip: block.inverseStrip,
       closeStrip: block.closeStrip,
     });
 
-    let parentProgram = this.currentElement();
-
-    appendChild(parentProgram, node);
+    this._injectStatement(node);
     return node;
   }
 
@@ -174,11 +190,17 @@ export abstract class HandlebarsNodeVisitors extends Parser {
     this.currentAttr.currentPart = null;
   }
 
-  ContentStatement(content: HBS.ContentStatement): void {
-    updateTokenizerLocation(this.tokenizer, content);
+  ContentStatement(content: HBS.ContentStatement): ASTv1.TextNode | void {
+    if (this.isConstrained) {
+      const text = b.text({ chars: content.value, loc: this.source.spanFor(content.loc) });
+      appendChild(this.currentElement(), text);
+      return text;
+    } else {
+      updateTokenizerLocation(this.tokenizer, content);
 
-    this.tokenizer.tokenizePart(content.value);
-    this.tokenizer.flushData();
+      this.tokenizer.tokenizePart(content.value);
+      this.tokenizer.flushData();
+    }
   }
 
   CommentStatement(rawComment: HBS.CommentStatement): Option<ASTv1.MustacheCommentStatement> {

@@ -249,6 +249,7 @@ export class TokenizerEventHandlers extends HandlebarsNodeVisitors {
       if (
         part.type !== 'MustacheStatement' &&
         part.type !== 'PartialStatement' &&
+        part.type !== 'BlockStatement' &&
         part.type !== 'TextNode'
       ) {
         throw generateSyntaxError(

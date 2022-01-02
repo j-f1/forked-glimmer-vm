@@ -20,7 +20,7 @@ export interface NodeMap {
   DecoratorBlock: { input: DecoratorBlock; output: ASTv1.DecoratorBlock | void };
   PartialStatement: { input: PartialStatement; output: ASTv1.PartialStatement };
   PartialBlockStatement: { input: PartialBlockStatement; output: ASTv1.PartialBlockStatement };
-  ContentStatement: { input: ContentStatement; output: void };
+  ContentStatement: { input: ContentStatement; output: ASTv1.TextNode | void };
   CommentStatement: { input: CommentStatement; output: ASTv1.MustacheCommentStatement | null };
   SubExpression: { input: SubExpression; output: ASTv1.SubExpression };
   PathExpression: { input: PathExpression; output: ASTv1.PathExpression };
