@@ -35,6 +35,23 @@ export class TokenizerEventHandlers extends HandlebarsNodeVisitors {
     this.currentNode = null;
   }
 
+  // Doctype
+  beginDoctype(): void {
+    this.currentNode = b.doctype('', this.source.offsetFor(this.tagOpenLine, this.tagOpenColumn));
+  }
+
+  appendToDoctypeName(char: string): void {
+    this.currentDoctype.value += char;
+  }
+
+  // not handled — HTML5 only needs the one above
+  // appendToDoctypePublicIdentifier(char: string): void;
+  // appendToDoctypeSystemIdentifier(char: string): void;
+
+  endDoctype(): void {
+    appendChild(this.currentElement(), this.finish(this.currentDoctype));
+  }
+
   // Comment
 
   beginComment(): void {

@@ -125,6 +125,14 @@ class Builders {
     };
   }
 
+  doctype(value: string, loc: SourceOffset): ParserNodeBuilder<ASTv1.DoctypeStatement> {
+    return {
+      type: 'DoctypeStatement',
+      value: value,
+      loc,
+    };
+  }
+
   comment(value: string, loc: SourceOffset): ParserNodeBuilder<ASTv1.CommentStatement> {
     return {
       type: 'CommentStatement',

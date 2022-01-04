@@ -131,6 +131,11 @@ export interface PartialBlockStatement extends BaseNode {
   closeStrip: StripFlags;
 }
 
+export interface DoctypeStatement extends BaseNode {
+  type: 'DoctypeStatement';
+  value: string;
+}
+
 export interface CommentStatement extends BaseNode {
   type: 'CommentStatement';
   value: string;
@@ -166,6 +171,7 @@ export interface ElementNode extends BaseNode {
 
 export type StatementName =
   | 'MustacheStatement'
+  | 'DoctypeStatement'
   | 'CommentStatement'
   | 'BlockStatement'
   | 'PartialStatement'
@@ -311,6 +317,7 @@ export interface StripFlags {
 }
 
 export type SharedNodes = {
+  DoctypeStatement: DoctypeStatement;
   CommentStatement: CommentStatement;
   MustacheCommentStatement: MustacheCommentStatement;
   TextNode: TextNode;

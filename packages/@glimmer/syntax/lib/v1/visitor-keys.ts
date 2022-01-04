@@ -15,6 +15,7 @@ const visitorKeys = {
   DecoratorBlock: tuple('path', 'params', 'hash', 'program', 'inverse'),
   PartialStatement: tuple('name', 'params', 'hash'),
   PartialBlockStatement: tuple('name', 'params', 'hash', 'content'),
+  DoctypeStatement: tuple(),
   CommentStatement: tuple(),
   MustacheCommentStatement: tuple(),
   ElementNode: tuple('attributes', 'modifiers', 'children', 'comments'),

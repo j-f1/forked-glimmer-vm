@@ -45,6 +45,7 @@ export abstract class Parser {
   public currentAttribute: Option<Attribute> = null;
   public currentNode: Option<
     Readonly<
+      | ParserNodeBuilder<ASTv1.DoctypeStatement>
       | ParserNodeBuilder<ASTv1.CommentStatement>
       | ASTv1.TextNode
       | ParserNodeBuilder<Tag<'StartTag'>>
@@ -138,6 +139,12 @@ export abstract class Parser {
   get currentEndTag(): ParserNodeBuilder<Tag<'EndTag'>> {
     let node = this.currentNode;
     assert(node && node.type === 'EndTag', 'expected end tag');
+    return node;
+  }
+
+  get currentDoctype(): ParserNodeBuilder<ASTv1.DoctypeStatement> {
+    let node = this.currentNode;
+    assert(node && node.type === 'DoctypeStatement', 'expected a doctype');
     return node;
   }
 
