@@ -1,6 +1,6 @@
 {
   "name": "@j-f/glimmer-syntax",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": "https://github.com/j-f1/forked-glimmer-vm/tree/prettier/packages/@glimmer/syntax",
   "dependencies": {
     "@glimmer/interfaces": "0.83.1",
