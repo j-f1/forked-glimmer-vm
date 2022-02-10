@@ -23,6 +23,7 @@
     "browserstack:disconnect": "ember browserstack:disconnect",
     "browserstack:results": "ember browserstack:results",
     "build": "ember build --env production --suppress-sizes",
+	"build:dev": "ember build --env development",
     "build:flags": "RETAIN_FLAGS=true ember build --env production --suppress-sizes",
     "build:typecheck": "tsc -p tsconfig.json --noEmit --pretty false",
     "link:local": "node bin/yarn-link-local",
