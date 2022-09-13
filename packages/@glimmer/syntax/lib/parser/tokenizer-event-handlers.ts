@@ -234,13 +234,15 @@ export class TokenizerEventHandlers extends HandlebarsNodeVisitors {
     throw generateSyntaxError(message, this.offset().collapsed());
   }
 
-  assembleConcatenatedValue(
-    parts: (ASTv1.MustacheStatement | ASTv1.TextNode)[]
-  ): ASTv1.ConcatStatement {
+  assembleConcatenatedValue(parts: (ASTv1.DynamicValue | ASTv1.TextNode)[]): ASTv1.ConcatStatement {
     for (let i = 0; i < parts.length; i++) {
       let part: ASTv1.BaseNode = parts[i];
 
-      if (part.type !== 'MustacheStatement' && part.type !== 'TextNode') {
+      if (
+        part.type !== 'MustacheStatement' &&
+        part.type !== 'PartialStatement' &&
+        part.type !== 'TextNode'
+      ) {
         throw generateSyntaxError(
           'Unsupported node in quoted attribute value: ' + part['type'],
           part.loc
@@ -280,11 +282,11 @@ export class TokenizerEventHandlers extends HandlebarsNodeVisitors {
   }
 
   assembleAttributeValue(
-    parts: (ASTv1.MustacheStatement | ASTv1.TextNode)[],
+    parts: (ASTv1.DynamicValue | ASTv1.TextNode)[],
     isQuoted: boolean,
     isDynamic: boolean,
     span: SourceSpan
-  ): ASTv1.ConcatStatement | ASTv1.MustacheStatement | ASTv1.TextNode {
+  ): ASTv1.ConcatStatement | ASTv1.DynamicValue | ASTv1.TextNode {
     if (isDynamic) {
       if (isQuoted) {
         return this.assembleConcatenatedValue(parts);

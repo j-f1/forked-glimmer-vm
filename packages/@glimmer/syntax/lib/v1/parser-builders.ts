@@ -101,7 +101,7 @@ class Builders {
     inverseStrip = DEFAULT_STRIP,
     closeStrip = DEFAULT_STRIP,
   }: {
-    path: ASTv1.PathExpression | ASTv1.SubExpression;
+    path: ASTv1.PathExpression | ASTv1.SubExpression | ASTv1.NumberLiteral;
     params: ASTv1.Expression[];
     hash: ASTv1.Hash;
     defaultBlock: ASTv1.Block;
@@ -142,7 +142,7 @@ class Builders {
   }
 
   concat(
-    parts: PresentArray<ASTv1.TextNode | ASTv1.MustacheStatement>,
+    parts: PresentArray<ASTv1.TextNode | ASTv1.DynamicValue>,
     loc: SourceSpan
   ): ASTv1.ConcatStatement {
     return {
@@ -171,26 +171,6 @@ class Builders {
       modifiers: modifiers || [],
       comments: (comments as ASTv1.MustacheCommentStatement[]) || [],
       children: children || [],
-      loc,
-    };
-  }
-
-  elementModifier({
-    path,
-    params,
-    hash,
-    loc,
-  }: {
-    path: ASTv1.PathExpression | ASTv1.SubExpression;
-    params: ASTv1.Expression[];
-    hash: ASTv1.Hash;
-    loc: SourceSpan;
-  }): ASTv1.ElementModifierStatement {
-    return {
-      type: 'ElementModifierStatement',
-      path,
-      params,
-      hash,
       loc,
     };
   }
@@ -226,7 +206,7 @@ class Builders {
     hash,
     loc,
   }: {
-    path: ASTv1.PathExpression | ASTv1.SubExpression;
+    path: ASTv1.PathExpression | ASTv1.SubExpression | ASTv1.NumberLiteral;
     params: ASTv1.Expression[];
     hash: ASTv1.Hash;
     loc: SourceSpan;
@@ -358,6 +338,61 @@ class Builders {
   number(value: number, loc: SourceSpan): ASTv1.NumberLiteral {
     return this.literal({ type: 'NumberLiteral', value, loc });
   }
+
+  partial({
+    name,
+    params,
+    hash,
+    strip,
+    indent,
+    loc,
+  }: {
+    name: ASTv1.PathExpression | ASTv1.SubExpression | ASTv1.NumberLiteral;
+    params: ASTv1.Expression[];
+    hash: ASTv1.Hash;
+    strip: ASTv1.StripFlags;
+    indent: string;
+    loc: SourceSpan;
+  }): ASTv1.PartialStatement {
+    return {
+      type: 'PartialStatement',
+      name,
+      params,
+      hash,
+      strip,
+      indent,
+      loc,
+    };
+  }
+
+  partialBlock({
+    name,
+    params,
+    hash,
+    program,
+    openStrip,
+    closeStrip,
+    loc,
+  }: {
+    name: ASTv1.PathExpression | ASTv1.SubExpression | ASTv1.NumberLiteral;
+    params: ASTv1.Expression[];
+    hash: ASTv1.Hash;
+    program: ASTv1.Block | ASTv1.Template;
+    openStrip: ASTv1.StripFlags;
+    closeStrip: ASTv1.StripFlags;
+    loc: SourceSpan;
+  }): ASTv1.PartialBlockStatement {
+    return {
+      type: 'PartialBlockStatement',
+      name,
+      params,
+      hash,
+      program,
+      openStrip,
+      closeStrip,
+      loc,
+    };
+  }
 }
 
 // Nodes
@@ -396,7 +431,7 @@ export interface BuildElementOptions {
   tag: string;
   selfClosing: boolean;
   attrs: ASTv1.AttrNode[];
-  modifiers: ASTv1.ElementModifierStatement[];
+  modifiers: ASTv1.DynamicValue[];
   children: ASTv1.Statement[];
   comments: ElementComment[];
   blockParams: string[];

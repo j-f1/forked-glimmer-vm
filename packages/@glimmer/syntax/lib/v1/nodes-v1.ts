@@ -72,14 +72,9 @@ export interface Call extends BaseNode {
   hash: Hash;
 }
 
-export type CallNode =
-  | MustacheStatement
-  | BlockStatement
-  | ElementModifierStatement
-  | SubExpression;
+export type CallNode = MustacheStatement | BlockStatement | SubExpression;
 
-export interface MustacheStatement extends BaseNode {
-  type: 'MustacheStatement';
+interface CommonMustache extends BaseNode {
   path: Expression;
   params: Expression[];
   hash: Hash;
@@ -88,9 +83,14 @@ export interface MustacheStatement extends BaseNode {
   trusting: boolean;
   strip: StripFlags;
 }
+export interface MustacheStatement extends CommonMustache {
+  type: 'MustacheStatement';
+}
+export interface DecoratorStatement extends CommonMustache {
+  type: 'DecoratorStatement';
+}
 
-export interface BlockStatement extends BaseNode {
-  type: 'BlockStatement';
+interface CommonBlock extends BaseNode {
   path: Expression;
   params: Expression[];
   hash: Hash;
@@ -104,20 +104,31 @@ export interface BlockStatement extends BaseNode {
   chained?: boolean;
 }
 
-export interface ElementModifierStatement extends BaseNode {
-  type: 'ElementModifierStatement';
-  path: Expression;
-  params: Expression[];
-  hash: Hash;
+export interface BlockStatement extends CommonBlock {
+  type: 'BlockStatement';
+}
+
+export interface DecoratorBlock extends CommonBlock {
+  type: 'DecoratorBlock';
 }
 
 export interface PartialStatement extends BaseNode {
   type: 'PartialStatement';
-  name: PathExpression | SubExpression;
+  name: PathExpression | SubExpression | NumberLiteral;
   params: Expression[];
   hash: Hash;
   indent: string;
   strip: StripFlags;
+}
+
+export interface PartialBlockStatement extends BaseNode {
+  type: 'PartialBlockStatement';
+  name: PathExpression | SubExpression | NumberLiteral;
+  params: Expression[];
+  hash: Hash;
+  program: Block | Template;
+  openStrip: StripFlags;
+  closeStrip: StripFlags;
 }
 
 export interface CommentStatement extends BaseNode {
@@ -148,7 +159,7 @@ export interface ElementNode extends BaseNode {
   selfClosing: boolean;
   attributes: AttrNode[];
   blockParams: string[];
-  modifiers: ElementModifierStatement[];
+  modifiers: DynamicValue[];
   comments: MustacheCommentStatement[];
   children: Statement[];
 }
@@ -158,6 +169,7 @@ export type StatementName =
   | 'CommentStatement'
   | 'BlockStatement'
   | 'PartialStatement'
+  | 'PartialBlockStatement'
   | 'MustacheCommentStatement'
   | 'TextNode'
   | 'ElementNode';
@@ -165,7 +177,7 @@ export type StatementName =
 export interface AttrNode extends BaseNode {
   type: 'AttrNode';
   name: string;
-  value: TextNode | MustacheStatement | ConcatStatement;
+  value: TextNode | DynamicValue | ConcatStatement;
 }
 
 export type AttrValue = TextNode | MustacheStatement | ConcatStatement;
@@ -177,7 +189,7 @@ export interface TextNode extends BaseNode {
 
 export interface ConcatStatement extends BaseNode {
   type: 'ConcatStatement';
-  parts: PresentArray<TextNode | MustacheStatement>;
+  parts: PresentArray<TextNode | DynamicValue>;
 }
 
 export type ExpressionName = 'SubExpression' | 'PathExpression' | LiteralName;
@@ -308,8 +320,10 @@ export type SharedNodes = {
   NullLiteral: NullLiteral;
   UndefinedLiteral: UndefinedLiteral;
   MustacheStatement: MustacheStatement;
-  ElementModifierStatement: ElementModifierStatement;
   PartialStatement: PartialStatement;
+  PartialBlockStatement: PartialBlockStatement;
+  DecoratorBlock: DecoratorBlock;
+  DecoratorStatement: DecoratorStatement;
   AttrNode: AttrNode;
   ConcatStatement: ConcatStatement;
 };
@@ -335,3 +349,4 @@ export type Literal = Nodes[LiteralName];
 export type Expression = Nodes[ExpressionName];
 export type Expressions = Pick<Nodes, ExpressionName>;
 export type TopLevelStatement = Statement | Nodes['Block'];
+export type DynamicValue = MustacheStatement | PartialStatement;

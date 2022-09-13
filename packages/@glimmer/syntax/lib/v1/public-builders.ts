@@ -97,21 +97,6 @@ function buildBlock(
   };
 }
 
-function buildElementModifier(
-  path: BuilderHead | ASTv1.Expression,
-  params?: ASTv1.Expression[],
-  hash?: ASTv1.Hash,
-  loc?: Option<SourceLocation>
-): ASTv1.ElementModifierStatement {
-  return {
-    type: 'ElementModifierStatement',
-    path: buildPath(path),
-    params: params || [],
-    hash: hash || buildHash([]),
-    loc: buildLoc(loc || null),
-  };
-}
-
 function buildPartial(
   name: ASTv1.PathExpression,
   params?: ASTv1.Expression[],
@@ -195,7 +180,7 @@ export type SexpValue =
 
 export interface BuildElementOptions {
   attrs?: ASTv1.AttrNode[];
-  modifiers?: ASTv1.ElementModifierStatement[];
+  modifiers?: ASTv1.DynamicValue[];
   children?: ASTv1.Statement[];
   comments?: ElementComment[];
   blockParams?: string[];
@@ -534,7 +519,6 @@ export default {
   comment: buildComment,
   mustacheComment: buildMustacheComment,
   element: buildElement,
-  elementModifier: buildElementModifier,
   attr: buildAttr,
   text: buildText,
   sexpr: buildSexpr,

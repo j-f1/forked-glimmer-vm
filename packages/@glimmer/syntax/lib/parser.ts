@@ -22,7 +22,7 @@ export interface Tag<T extends 'StartTag' | 'EndTag'> {
   readonly type: T;
   name: string;
   readonly attributes: ASTv1.AttrNode[];
-  readonly modifiers: ASTv1.ElementModifierStatement[];
+  readonly modifiers: ASTv1.DynamicValue[];
   readonly comments: ASTv1.MustacheCommentStatement[];
   selfClosing: boolean;
   readonly loc: SourceSpan;
@@ -31,7 +31,7 @@ export interface Tag<T extends 'StartTag' | 'EndTag'> {
 export interface Attribute {
   name: string;
   currentPart: ASTv1.TextNode | null;
-  parts: (ASTv1.MustacheStatement | ASTv1.TextNode)[];
+  parts: (ASTv1.DynamicValue | ASTv1.TextNode)[];
   isQuoted: boolean;
   isDynamic: boolean;
   start: SourceOffset;

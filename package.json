@@ -1,11 +1,11 @@
 {
   "name": "glimmer-engine",
-  "version": "0.83.1",
+  "version": "0.83.1-ex",
   "private": true,
   "description": "Glimmer compiles Handlebars templates into document fragments rather than string buffers",
   "repository": {
     "type": "git",
-    "url": "https://github.com/glimmerjs/glimmer-vm.git"
+    "url": "https://github.com/CAndRyan/forked-glimmer-vm.git"
   },
   "license": "MIT",
   "author": "Tilde, Inc.",
@@ -23,6 +23,7 @@
     "browserstack:disconnect": "ember browserstack:disconnect",
     "browserstack:results": "ember browserstack:results",
     "build": "ember build --env production --suppress-sizes",
+	"build:dev": "ember build --env development",
     "build:flags": "RETAIN_FLAGS=true ember build --env production --suppress-sizes",
     "build:typecheck": "tsc -p tsconfig.json --noEmit --pretty false",
     "link:local": "node bin/yarn-link-local",

@@ -20,7 +20,6 @@ import {
   AttrValueSyntaxContext,
   BlockSyntaxContext,
   ComponentSyntaxContext,
-  ModifierSyntaxContext,
   Resolution,
   SexpSyntaxContext,
 } from './loose-resolution';
@@ -312,6 +311,7 @@ class StatementNormalizer {
   normalize(node: ASTv1.Statement): ASTv2.ContentNode | ASTv2.NamedBlock {
     switch (node.type) {
       case 'PartialStatement':
+      case 'PartialBlockStatement':
         throw new Error(`Handlebars partial syntax ({{> ...}}) is not allowed in Glimmer`);
       case 'BlockStatement':
         return this.BlockStatement(node);
@@ -462,7 +462,7 @@ class ElementNormalizer {
     let attrs = element.attributes.filter((a) => a.name[0] !== '@').map((a) => this.attr(a));
     let args = element.attributes.filter((a) => a.name[0] === '@').map((a) => this.arg(a));
 
-    let modifiers = element.modifiers.map((m) => this.modifier(m));
+    let modifiers = [] as any; // element.modifiers.map((m) => this.modifier(m));
 
     // the element's block params are in scope for the children
     let child = this.ctx.child(element.blockParams);
@@ -500,20 +500,6 @@ class ElementNormalizer {
       let blocks = children.assertComponent(tag, child.table, element.blockParams.length > 0);
       return el.componentWithNamedBlocks(path, blocks, loc);
     }
-  }
-
-  private modifier(m: ASTv1.ElementModifierStatement): ASTv2.ElementModifier {
-    let resolution = this.ctx.resolutionFor(m, ModifierSyntaxContext);
-
-    if (resolution.resolution === 'error') {
-      throw generateSyntaxError(
-        `You attempted to invoke a path (\`{{#${resolution.path}}}\`) as a modifier, but ${resolution.head} was not in scope. Try adding \`this\` to the beginning of the path`,
-        m.loc
-      );
-    }
-
-    let callParts = this.expr.callParts(m, resolution.resolution);
-    return this.ctx.builder.modifier(callParts, this.ctx.loc(m.loc));
   }
 
   /**
@@ -563,7 +549,7 @@ class ElementNormalizer {
   ): { expr: ASTv2.ExpressionNode; trusting: boolean } {
     switch (part.type) {
       case 'ConcatStatement': {
-        let parts = part.parts.map((p) => this.attrPart(p).expr);
+        let parts = part.parts.map((p) => this.attrPart(p as any).expr);
         return {
           expr: this.ctx.builder.interpolate(parts, this.ctx.loc(part.loc)),
           trusting: false,
@@ -584,7 +570,7 @@ class ElementNormalizer {
     let offsets = this.ctx.loc(m.loc);
     let nameSlice = offsets.sliceStartChars({ chars: m.name.length }).toSlice(m.name);
 
-    let value = this.attrValue(m.value);
+    let value = this.attrValue(m.value as any);
     return this.ctx.builder.attr(
       { name: nameSlice, value: value.expr, trusting: value.trusting },
       offsets
@@ -652,7 +638,8 @@ class ElementNormalizer {
     let offsets = this.ctx.loc(arg.loc);
     let nameSlice = offsets.sliceStartChars({ chars: arg.name.length }).toSlice(arg.name);
 
-    let value = this.maybeDeprecatedCall(nameSlice, arg.value) || this.attrValue(arg.value);
+    let value =
+      this.maybeDeprecatedCall(nameSlice, arg.value as any) || this.attrValue(arg.value as any);
     return this.ctx.builder.arg(
       { name: nameSlice, value: value.expr, trusting: value.trusting },
       offsets

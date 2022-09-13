@@ -96,8 +96,6 @@ export default class Printer {
         return this.Hash(node);
       case 'HashPair':
         return this.HashPair(node);
-      case 'ElementModifierStatement':
-        return this.ElementModifierStatement(node);
     }
   }
 
@@ -223,17 +221,7 @@ export default class Printer {
 
     for (const part of parts) {
       this.buffer += ' ';
-      switch (part.type) {
-        case 'AttrNode':
-          this.AttrNode(part);
-          break;
-        case 'ElementModifierStatement':
-          this.ElementModifierStatement(part);
-          break;
-        case 'MustacheCommentStatement':
-          this.MustacheCommentStatement(part);
-          break;
-      }
+      this[part.type](part as any);
     }
     if (el.blockParams.length) {
       this.BlockParams(el.blockParams);
@@ -393,18 +381,6 @@ export default class Printer {
     }
 
     this.buffer += `{{!--${comment.value}--}}`;
-  }
-
-  ElementModifierStatement(mod: ASTv1.ElementModifierStatement): void {
-    if (this.handledByOverride(mod)) {
-      return;
-    }
-
-    this.buffer += '{{';
-    this.Expression(mod.path);
-    this.Params(mod.params);
-    this.Hash(mod.hash);
-    this.buffer += '}}';
   }
 
   CommentStatement(comment: ASTv1.CommentStatement): void {

@@ -15,11 +15,11 @@ export interface CommonNode {
 export interface NodeMap {
   Program: { input: Program; output: ASTv1.Template | ASTv1.Block };
   MustacheStatement: { input: MustacheStatement; output: ASTv1.MustacheStatement | void };
-  Decorator: { input: Decorator; output: never };
+  Decorator: { input: Decorator; output: ASTv1.DecoratorStatement | void };
   BlockStatement: { input: BlockStatement; output: ASTv1.BlockStatement | void };
-  DecoratorBlock: { input: DecoratorBlock; output: never };
-  PartialStatement: { input: PartialStatement; output: never };
-  PartialBlockStatement: { input: PartialBlockStatement; output: never };
+  DecoratorBlock: { input: DecoratorBlock; output: ASTv1.DecoratorBlock | void };
+  PartialStatement: { input: PartialStatement; output: ASTv1.PartialStatement };
+  PartialBlockStatement: { input: PartialBlockStatement; output: ASTv1.PartialBlockStatement };
   ContentStatement: { input: ContentStatement; output: void };
   CommentStatement: { input: CommentStatement; output: ASTv1.MustacheCommentStatement | null };
   SubExpression: { input: SubExpression; output: ASTv1.SubExpression };
@@ -101,7 +101,7 @@ export interface DecoratorBlock extends CommonBlock {
 
 export interface PartialStatement extends CommonNode {
   type: 'PartialStatement';
-  name: PathExpression | SubExpression;
+  name: PathExpression | SubExpression | NumberLiteral;
   params: Expression[];
   hash: Hash;
   indent: string;
@@ -110,7 +110,7 @@ export interface PartialStatement extends CommonNode {
 
 export interface PartialBlockStatement extends CommonNode {
   type: 'PartialBlockStatement';
-  name: PathExpression | SubExpression;
+  name: PathExpression | SubExpression | NumberLiteral;
   params: Expression[];
   hash: Hash;
   program: Program;
